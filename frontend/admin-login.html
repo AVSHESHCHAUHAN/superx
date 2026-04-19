@@ -34,7 +34,7 @@ async function doLogin(){
   if(!un||!pw){msg.className='lmsg err';msg.textContent='Please fill in all fields.';return;}
   lb.disabled=true;lb.textContent='Verifying...';
   try{
-    const r=await fetch('http://localhost:8080/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw})});
+    const r=await fetch('https://superx-production-2b1d.up.railway.app/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw})});
     if(!r.ok)throw new Error('Server error');
     const d=await r.json();
     if(d.success){
