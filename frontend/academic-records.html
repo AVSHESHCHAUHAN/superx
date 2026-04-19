@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Records — EduCore</title>
+<link rel="stylesheet" href="student.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-logo">🎓</div><div class="sb-name">Edu<span>Core</span></div></div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html" class="active"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer"><button class="logout-btn" onclick="logout()">🚪 Logout</button></div>
+</div>
+<div class="content">
+  <div class="ph">
+    <div><h1>Academic Records</h1><p>Subject-wise marks, grades and CGPA</p></div>
+  </div>
+  <div class="sc-grid" id="cards" style="display:none;">
+    <div class="sc"><div class="slabel">CGPA</div><div class="sval" id="cgpa">—</div></div>
+    <div class="sc"><div class="slabel">Average Marks</div><div class="sval" id="avg">—</div></div>
+    <div class="sc"><div class="slabel">Total Subjects</div><div class="sval" id="nsub">—</div></div>
+    <div class="sc"><div class="slabel">Best Subject</div><div class="sval" id="best" style="font-size:15px;">—</div></div>
+  </div>
+  <div class="card">
+    <div id="cont"><div class="lw"><div class="spin"></div></div></div>
+    <div id="btns" style="display:none;">
+      <button class="btn-dl" onclick="dlPDF()">📄 Download Report PDF</button>
+      <button class="btn-sec" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+</div>
+<script>
+const BASE='http://localhost:8080';
+const sid=localStorage.getItem('studentId');
+if(!sid){window.location.replace('student-login.html');}
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+function grade(m){if(m>=90)return'A+';if(m>=80)return'A';if(m>=70)return'B';if(m>=60)return'C';if(m>=50)return'D';return'F';}
+function gp(g){return{'A+':10,'A':9,'B':8,'C':7,'D':6,'F':0}[g]||0;}
+
+let rawData=[];
+
+async function load(){
+  try{
+    const r=await fetch(`${BASE}/student/marks/${sid}`);
+    const data=await r.json();
+    if(!data||!data.length){
+      document.getElementById('cont').innerHTML='<div class="empty"><div class="ei">📊</div><p>No academic records found.</p></div>';return;
+    }
+    rawData=data;
+    let tm=0,tgp=0,best={name:'',m:-1};
+    const rows=data.map(r=>{
+      const m=Number(r.marks)||0;const g=grade(m);const p=gp(g);
+      tm+=m;tgp+=p;
+      if(m>best.m)best={name:r.subject,m};
+      const bc=m>=75?'bg':m>=50?'by':'br';
+      return`<tr><td>${r.subject}</td><td>${m}/100</td><td><span class="badge ${bc}">${g}</span></td><td>${p}</td><td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="pbar" style="width:70px;"><div class="pfill" style="width:${m}%;background:${m>=75?'#22c55e':m>=50?'#f59e0b':'#ef4444'}"></div></div>
+          <span style="font-size:11px;color:var(--sub);">${m}%</span>
+        </div></td></tr>`;
+    }).join('');
+    const av=Math.round(tm/data.length);
+    const cg=(tgp/data.length).toFixed(2);
+    document.getElementById('cont').innerHTML=`<div class="tw"><table>
+      <thead><tr><th>Subject</th><th>Marks</th><th>Grade</th><th>Grade Points</th><th>Performance</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:rgba(34,197,94,0.06);">
+        <td style="font-weight:700;color:var(--gl);">Overall Average</td>
+        <td style="font-weight:700;color:var(--gl);">${av}/100</td>
+        <td colspan="3" style="font-weight:700;color:var(--gl);">CGPA: ${cg}</td>
+      </tr></tfoot></table></div>`;
+    document.getElementById('cgpa').textContent=cg;
+    document.getElementById('avg').textContent=av+'%';
+    document.getElementById('nsub').textContent=data.length;
+    document.getElementById('best').textContent=best.name;
+    document.getElementById('cards').style.display='grid';
+    document.getElementById('btns').style.display='block';
+  }catch(e){
+    document.getElementById('cont').innerHTML='<div class="empty"><div class="ei">⚠️</div><p style="color:#fca5a5;">Failed to load records. Check backend.</p></div>';
+  }
+}
+
+function dlPDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  // Header
+  doc.setFillColor(22,163,74);doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont('helvetica','bold');
+  doc.text('EduCore — Academic Report',14,12);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text('Student ID: '+sid+'   |   Generated: '+new Date().toLocaleDateString('en-IN'),14,21);
+  // Stats
+  const cg=document.getElementById('cgpa').textContent;
+  const av=document.getElementById('avg').textContent;
+  doc.setTextColor(40,40,40);doc.setFontSize(11);doc.setFont('helvetica','bold');
+  doc.text('CGPA: '+cg+'   |   Average: '+av+'   |   Subjects: '+rawData.length,14,36);
+  // Table
+  const rows=rawData.map(r=>{
+    const m=Number(r.marks)||0;const g=grade(m);const p=gp(g);
+    return[r.subject,m+'/100',g,p,m+'%'];
+  });
+  doc.autoTable({
+    head:[['Subject','Marks','Grade','Grade Points','Percentage']],
+    body:rows,startY:42,theme:'striped',
+    headStyles:{fillColor:[22,163,74],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[240,253,244]},
+    styles:{halign:'center',fontSize:11},
+    columnStyles:{0:{halign:'left'}}
+  });
+  const fy=doc.lastAutoTable.finalY+10;
+  doc.setFontSize(10);doc.setTextColor(100);
+  doc.text('This is a computer-generated report. No signature required.',14,fy);
+  doc.text('EduCore Student Management System | '+new Date().toLocaleDateString('en-IN'),14,fy+6);
+  doc.save('Academic_Report_'+sid+'.pdf');
+}
+load();
+</script>
+</body>
+</html>

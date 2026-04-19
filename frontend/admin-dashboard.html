@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — EduCore</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 0 20px rgba(245,158,11,.2);">⚙️</div>
+    <div class="sb-name">Admin</div>
+  </div>
+
+  <div class="sb-label">Students</div>
+  <button onclick="show('student')" id="b-student"><span class="bi">➕</span>Add Student</button>
+  <button onclick="show('updateStudent')" id="b-updateStudent"><span class="bi">✏️</span>Update Student</button>
+
+  <div class="sb-label">Academics</div>
+  <button onclick="show('marks')" id="b-marks"><span class="bi">📊</span>Add Marks</button>
+  <button onclick="show('attendance')" id="b-attendance"><span class="bi">📅</span>Add Attendance</button>
+
+  <div class="sb-label">Finance</div>
+  <button onclick="show('fees')" id="b-fees"><span class="bi">💳</span>Update Fees</button>
+  <button onclick="show('transaction')" id="b-transaction"><span class="bi">💰</span>Add Transaction</button>
+
+  <div class="sb-label">Courses &amp; Faculty</div>
+  <button onclick="show('course')" id="b-course"><span class="bi">📚</span>Add Course</button>
+  <button onclick="show('updateCourse')" id="b-updateCourse"><span class="bi">🔄</span>Update Course</button>
+  <button onclick="show('faculty')" id="b-faculty"><span class="bi">👨‍🏫</span>Add Faculty</button>
+  <button onclick="show('updateFaculty')" id="b-updateFaculty"><span class="bi">✏️</span>Update Faculty</button>
+
+  <div class="sb-footer">
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="ph">
+    <h1>Admin Dashboard</h1>
+    <div class="admin-tag">⚙️ Admin Mode</div>
+  </div>
+
+  <div class="wcard" id="wcard">
+    <div class="wi">👋</div>
+    <div>
+      <h2>Welcome, Administrator</h2>
+      <p>Select an action from the sidebar to manage students, marks, attendance, fees, courses or faculty.</p>
+    </div>
+  </div>
+
+  <div id="fa"></div>
+</div>
+
+<script>
+// SESSION GUARD
+if(!localStorage.getItem('admin')){window.location.replace('admin-login.html');}
+function logout(){localStorage.removeItem('admin');window.location.replace('admin-login.html');}
+
+const BASE='http://localhost:8080';
+
+const SECS={
+  student:{t:'Add Student',f:[
+    {id:'studentId',l:'Student ID',p:'e.g. STU2024001'},
+    {id:'name',l:'Full Name',p:'Student full name'},
+    {id:'email',l:'Email',p:'student@email.com'},
+    {id:'course',l:'Course',p:'e.g. B.Tech Computer Science'},
+    {id:'phone',l:'Phone',p:'Mobile number'},
+    {id:'password',l:'Password',p:'Login password for student'},
+  ],ac:'addStudent'},
+  updateStudent:{t:'Update Student',f:[
+    {id:'studentId',l:'Student ID',p:'ID of student to update'},
+    {id:'name',l:'New Name',p:'Updated full name'},
+    {id:'email',l:'New Email',p:'Updated email'},
+    {id:'course',l:'Course',p:'Updated course'},
+    {id:'phone',l:'Phone',p:'Updated phone'},
+  ],ac:'updateStudent'},
+  marks:{t:'Add / Update Marks',f:[
+    {id:'studentId',l:'Student ID',p:'e.g. STU2024001'},
+    {id:'subject',l:'Subject',p:'e.g. Mathematics'},
+    {id:'marks',l:'Marks (out of 100)',p:'0 – 100'},
+  ],ac:'addMarks'},
+  attendance:{t:'Add / Update Attendance',f:[
+    {id:'studentId',l:'Student ID',p:'e.g. STU2024001'},
+    {id:'subject',l:'Subject',p:'e.g. Physics'},
+    {id:'total',l:'Total Classes',p:'Number of classes held'},
+    {id:'attended',l:'Classes Attended',p:'Number student attended'},
+  ],ac:'addAttendance'},
+  fees:{t:'Update Fees',f:[
+    {id:'studentId',l:'Student ID',p:'e.g. STU2024001'},
+    {id:'total',l:'Total Fees (₹)',p:'e.g. 150000'},
+    {id:'paid',l:'Amount Paid (₹)',p:'Amount paid so far'},
+    {id:'due',l:'Due Amount (₹)',p:'Remaining balance'},
+    {id:'status',l:'Status',p:'Paid / Partial / Pending'},
+  ],ac:'updateFees'},
+  transaction:{t:'Add Transaction',f:[
+    {id:'studentId',l:'Student ID',p:'e.g. STU2024001'},
+    {id:'amount',l:'Amount (₹)',p:'Transaction amount'},
+    {id:'method',l:'Payment Method',p:'UPI / Cash / Card / DD'},
+  ],ac:'addTransaction'},
+  course:{t:'Add Course',f:[
+    {id:'courseId',l:'Course ID',p:'e.g. CS301'},
+    {id:'courseName',l:'Course Name',p:'e.g. Data Structures'},
+    {id:'department',l:'Department',p:'e.g. Computer Science'},
+    {id:'credits',l:'Credits',p:'e.g. 4'},
+  ],ac:'addCourse'},
+  updateCourse:{t:'Update Course',f:[
+    {id:'courseId',l:'Course ID',p:'ID to update'},
+    {id:'courseName',l:'Course Name',p:'Updated name'},
+    {id:'department',l:'Department',p:'Updated department'},
+    {id:'credits',l:'Credits',p:'Updated credits'},
+  ],ac:'updateCourse'},
+  faculty:{t:'Add Faculty',f:[
+    {id:'name',l:'Full Name',p:'Dr. / Prof. name'},
+    {id:'subject',l:'Subject',p:'Teaching subject'},
+    {id:'designation',l:'Designation',p:'Professor / Asst. Prof.'},
+    {id:'experience',l:'Experience',p:'e.g. 8 Years'},
+    {id:'email',l:'Email',p:'faculty@college.edu'},
+  ],ac:'addFaculty'},
+  updateFaculty:{t:'Update Faculty',f:[
+    {id:'email',l:'Faculty Email',p:'Existing faculty email'},
+    {id:'designation',l:'New Designation',p:'Updated title'},
+    {id:'experience',l:'Experience',p:'Updated years'},
+  ],ac:'updateFaculty'},
+};
+
+function setActive(id){
+  document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('b-'+id);if(el)el.classList.add('active');
+}
+
+function show(type){
+  const s=SECS[type];if(!s)return;
+  setActive(type);
+  document.getElementById('wcard').style.display='none';
+  const fh=s.f.map(f=>`
+    <div class="fg"><label>${f.l}</label><input type="${f.id==='password'?'password':'text'}" id="${f.id}" placeholder="${f.p}"></div>
+  `).join('');
+  document.getElementById('fa').innerHTML=`
+    <div class="fcard">
+      <h2>${s.t}</h2>
+      ${fh}
+      <button class="sbtn" onclick="${s.ac}()">Save →</button>
+    </div>`;
+}
+
+function toast(msg,ok=true){
+  const t=document.createElement('div');
+  t.className='toast '+(ok?'ts':'te');
+  t.innerHTML=(ok?'✅ ':'❌ ')+msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+function v(id){return(document.getElementById(id)||{}).value||'';}
+async function post(url,data){try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return r.ok;}catch{return false;}}
+async function put(url,data){try{const r=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return r.ok;}catch{return false;}}
+
+async function addStudent(){
+  const ok=await post(`${BASE}/admin/addStudent`,{studentId:v('studentId'),name:v('name'),email:v('email'),course:v('course'),phone:v('phone'),password:v('password')});
+  toast(ok?'Student added successfully!':'Failed to add student.',ok);
+}
+async function updateStudent(){
+  const id=v('studentId');
+  const ok=await put(`${BASE}/admin/updateStudent/${id}`,{name:v('name'),email:v('email'),course:v('course'),phone:v('phone')});
+  toast(ok?'Student updated!':'Failed to update.',ok);
+}
+async function addMarks(){
+  const ok=await post(`${BASE}/admin/addMarks`,{studentId:v('studentId'),subject:v('subject'),marks:Number(v('marks'))});
+  toast(ok?'Marks added!':'Failed.',ok);
+}
+async function addAttendance(){
+  const ok=await post(`${BASE}/admin/addAttendance`,{studentId:v('studentId'),subject:v('subject'),total:Number(v('total')),attended:Number(v('attended'))});
+  toast(ok?'Attendance recorded!':'Failed.',ok);
+}
+async function updateFees(){
+  const id=v('studentId');
+  const ok=await put(`${BASE}/admin/updateFees/${id}`,{total:Number(v('total')),paid:Number(v('paid')),due:Number(v('due')),status:v('status')});
+  toast(ok?'Fees updated!':'Failed.',ok);
+}
+async function addTransaction(){
+  const ok=await post(`${BASE}/admin/addTransaction`,{studentId:v('studentId'),amount:Number(v('amount')),method:v('method')});
+  toast(ok?'Transaction added!':'Failed.',ok);
+}
+async function addCourse(){
+  const ok=await post(`${BASE}/admin/addCourse`,{courseId:v('courseId'),courseName:v('courseName'),department:v('department'),credits:Number(v('credits'))});
+  toast(ok?'Course added!':'Failed.',ok);
+}
+async function updateCourse(){
+  const id=v('courseId');
+  const ok=await put(`${BASE}/admin/updateCourse/${id}`,{courseName:v('courseName'),department:v('department'),credits:Number(v('credits'))});
+  toast(ok?'Course updated!':'Failed.',ok);
+}
+async function addFaculty(){
+  const ok=await post(`${BASE}/admin/addFaculty`,{name:v('name'),subject:v('subject'),designation:v('designation'),experience:v('experience'),email:v('email')});
+  toast(ok?'Faculty added!':'Failed.',ok);
+}
+async function updateFaculty(){
+  const email=v('email');
+  const ok=await put(`${BASE}/admin/updateFaculty/${email}`,{designation:v('designation'),experience:v('experience')});
+  toast(ok?'Faculty updated!':'Failed.',ok);
+}
+</script>
+</body>
+</html>

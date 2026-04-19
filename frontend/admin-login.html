@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — EduCore</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="login-pg">
+  <div class="lorb lo1"></div>
+  <div class="lorb lo2"></div>
+  <div class="lcard">
+    <div class="lbrand">
+      <div class="lbico amber-ico">⚙️</div>
+      <div><h1>EduCore Admin</h1><p>Management Portal</p></div>
+    </div>
+    <div class="lbadge" style="background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.15);color:#fcd34d;">🔒 Restricted Access</div>
+    <div class="lh2">Admin Sign In</div>
+    <div class="lsub">Authorized administrators only</div>
+    <div class="lfg"><label>Username</label><input type="text" id="un" placeholder="Enter admin username" autocomplete="username"></div>
+    <div class="lfg"><label>Password</label><input type="password" id="pw" placeholder="Enter admin password" autocomplete="current-password"></div>
+    <button class="lbtn amber-btn" id="lb" onclick="doLogin()">Access Admin Panel</button>
+    <div id="msg" class="lmsg"></div>
+    <div class="lback"><a href="index.html">← Back to home</a></div>
+  </div>
+</div>
+<script>
+async function doLogin(){
+  const un=document.getElementById('un').value.trim();
+  const pw=document.getElementById('pw').value.trim();
+  const msg=document.getElementById('msg');const lb=document.getElementById('lb');
+  msg.className='lmsg';msg.textContent='';
+  if(!un||!pw){msg.className='lmsg err';msg.textContent='Please fill in all fields.';return;}
+  lb.disabled=true;lb.textContent='Verifying...';
+  try{
+    const r=await fetch('http://localhost:8080/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw})});
+    if(!r.ok)throw new Error('Server error');
+    const d=await r.json();
+    if(d.success){
+      localStorage.setItem('admin','true');
+      msg.className='lmsg ok';msg.textContent='Verified! Redirecting...';
+      setTimeout(()=>{window.location.href='admin-dashboard.html';},800);
+    }else{
+      msg.className='lmsg err';msg.textContent='Invalid credentials. Access denied.';
+      lb.disabled=false;lb.textContent='Access Admin Panel';
+    }
+  }catch(e){
+    msg.className='lmsg err';msg.textContent='Server not reachable. Check backend.';
+    lb.disabled=false;lb.textContent='Access Admin Panel';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>

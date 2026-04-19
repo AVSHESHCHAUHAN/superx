@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — EduCore</title>
+<link rel="stylesheet" href="student.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">🎓</div>
+    <div class="sb-name">Edu<span>Core</span></div>
+  </div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html" class="active"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer">
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="ph">
+    <div>
+      <h1 id="wt">Welcome 👋</h1>
+      <p id="wid">Loading your profile...</p>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);" id="dtm"></div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="sc-grid">
+    <div class="sc"><div class="slabel">Student ID</div><div class="sval" id="sc-id" style="font-size:17px;">—</div></div>
+    <div class="sc"><div class="slabel">CGPA</div><div class="sval" id="sc-cgpa">—</div><div class="ssub">Based on marks</div></div>
+    <div class="sc"><div class="slabel">Attendance</div><div class="sval" id="sc-att">—</div><div class="ssub">Overall</div></div>
+    <div class="sc"><div class="slabel">Fee Status</div><div class="sval" id="sc-fee" style="font-size:17px;">—</div></div>
+  </div>
+
+  <!-- Quick links -->
+  <div class="card">
+    <h2>🚀 Quick Access</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;">
+      <a href="academic-records.html" class="qlink">
+        <div class="ql-ico">📊</div>
+        <div class="ql-txt"><div class="ql-title">Academic Records</div><div class="ql-sub">Marks, grades &amp; CGPA</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+      <a href="attendance.html" class="qlink">
+        <div class="ql-ico">📅</div>
+        <div class="ql-txt"><div class="ql-title">Attendance</div><div class="ql-sub">Subject-wise report</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+      <a href="fees.html" class="qlink">
+        <div class="ql-ico">💳</div>
+        <div class="ql-txt"><div class="ql-title">Fees &amp; Payments</div><div class="ql-sub">Status &amp; receipts</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+      <a href="courses.html" class="qlink">
+        <div class="ql-ico">📚</div>
+        <div class="ql-txt"><div class="ql-title">My Courses</div><div class="ql-sub">Enrolled this semester</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+      <a href="personal-details.html" class="qlink">
+        <div class="ql-ico">👤</div>
+        <div class="ql-txt"><div class="ql-title">Personal Details</div><div class="ql-sub">Your profile info</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+      <a href="faculty.html" class="qlink">
+        <div class="ql-ico">👨‍🏫</div>
+        <div class="ql-txt"><div class="ql-title">Faculty</div><div class="ql-sub">Teaching staff info</div></div>
+        <div class="ql-arr">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Notice board -->
+  <div class="card">
+    <h2>📌 Notice Board</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="notice ni-warn">⚠️ &nbsp;<b>Exam Schedule:</b> Mid-semester exams begin April 15, 2026. Check academic records for your schedule.</div>
+      <div class="notice ni-info">📢 &nbsp;<b>Fee Reminder:</b> Last date to pay semester fees without penalty is April 20, 2026.</div>
+      <div class="notice ni-green">✅ &nbsp;<b>Result Published:</b> Internal assessment marks for all subjects are now available in Academic Records.</div>
+    </div>
+  </div>
+</div>
+
+<style>
+.qlink{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;text-decoration:none;color:var(--text);
+  transition:all .18s;
+}
+.qlink:hover{border-color:var(--border2);background:rgba(34,197,94,.06);transform:translateX(3px);}
+.ql-ico{font-size:20px;flex-shrink:0;}
+.ql-txt{flex:1;}
+.ql-title{font-size:13.5px;font-weight:600;color:var(--text);}
+.ql-sub{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.ql-arr{font-size:14px;color:var(--muted);transition:all .18s;}
+.qlink:hover .ql-arr{color:var(--gl);transform:translateX(2px);}
+.notice{padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.55;}
+.ni-warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.14);color:#fde68a;}
+.ni-info{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.14);color:#93c5fd;}
+.ni-green{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);color:#86efac;}
+</style>
+
+<script>
+const BASE='http://localhost:8080';
+const sid=localStorage.getItem('studentId');
+// SESSION GUARD — redirect if not logged in
+if(!sid){window.location.replace('student-login.html');}
+
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+function gp(m){if(m>=90)return 10;if(m>=80)return 9;if(m>=70)return 8;if(m>=60)return 7;if(m>=50)return 6;return 0;}
+
+// Date/time
+const now=new Date();
+document.getElementById('dtm').textContent=now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+async function init(){
+  const un=localStorage.getItem('username')||sid;
+  document.getElementById('wt').textContent='Welcome, '+un+' 👋';
+  document.getElementById('wid').textContent='Student ID: '+sid;
+  document.getElementById('sc-id').textContent=sid;
+
+  try{
+    const mr=await fetch(`${BASE}/student/marks/${sid}`);
+    const marks=await mr.json();
+    if(marks&&marks.length){
+      const cgpa=(marks.reduce((s,r)=>s+gp(Number(r.marks)),0)/marks.length).toFixed(2);
+      document.getElementById('sc-cgpa').textContent=cgpa;
+    }
+  }catch(e){}
+
+  try{
+    const ar=await fetch(`${BASE}/student/attendance/${sid}`);
+    const att=await ar.json();
+    if(att&&att.length){
+      const tc=att.reduce((s,r)=>s+Number(r.total||0),0);
+      const ta=att.reduce((s,r)=>s+Number(r.attended||0),0);
+      const pct=tc?Math.round(ta/tc*100):0;
+      const el=document.getElementById('sc-att');
+      el.textContent=pct+'%';
+      el.style.color=pct<75?'#fca5a5':'#86efac';
+    }
+  }catch(e){}
+
+  try{
+    const fr=await fetch(`${BASE}/student/fees/${sid}`);
+    const fee=await fr.json();
+    if(fee){
+      const el=document.getElementById('sc-fee');
+      el.textContent=fee.status||'—';
+      el.style.color=fee.status==='Paid'?'#86efac':fee.status==='Pending'?'#fca5a5':'#fde047';
+    }
+  }catch(e){}
+
+  // fetch name if not stored
+  if(!localStorage.getItem('username')||localStorage.getItem('username')===sid){
+    try{
+      const pr=await fetch(`${BASE}/student/${sid}`);
+      const pd=await pr.json();
+      if(pd&&pd.name){
+        document.getElementById('wt').textContent='Welcome, '+pd.name+' 👋';
+        localStorage.setItem('username',pd.name);
+      }
+    }catch(e){}
+  }
+}
+init();
+</script>
+</body>
+</html>

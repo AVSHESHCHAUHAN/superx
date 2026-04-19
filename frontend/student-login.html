@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Login — EduCore</title>
+<link rel="stylesheet" href="student.css">
+<style>
+body{display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;}
+.o1{width:500px;height:500px;background:rgba(34,197,94,0.08);top:-150px;right:-150px;animation:f1 12s ease-in-out infinite;}
+.o2{width:350px;height:350px;background:rgba(22,163,74,0.05);bottom:-100px;left:-100px;animation:f1 9s ease-in-out infinite reverse;}
+@keyframes f1{0%,100%{transform:translate(0,0);}50%{transform:translate(25px,-25px);}}
+.wrap{display:flex;max-width:800px;width:90%;border-radius:22px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);z-index:1;animation:up .65s cubic-bezier(.16,1,.3,1) both;}
+@keyframes up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.left{
+  background:linear-gradient(160deg,rgba(22,163,74,0.12),rgba(34,197,94,0.05));
+  border:1px solid var(--border);border-right:none;
+  border-radius:22px 0 0 22px;padding:44px 36px;width:300px;flex-shrink:0;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.lbrand{display:flex;align-items:center;gap:11px;margin-bottom:40px;}
+.lbrand .ico{
+  width:40px;height:40px;background:linear-gradient(135deg,var(--g),var(--gl));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 0 20px rgba(34,197,94,.22);
+}
+.lbrand .nm{font-size:17px;font-weight:700;color:var(--text);}
+.lbrand .nm span{color:var(--gl);}
+.tagline h2{font-size:22px;font-weight:700;line-height:1.3;color:var(--text);margin-bottom:12px;}
+.tagline p{font-size:13px;color:var(--sub);line-height:1.65;}
+.feats{display:flex;flex-direction:column;gap:10px;margin-top:32px;}
+.feat{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--sub);}
+.fd{width:5px;height:5px;background:var(--gl);border-radius:50%;flex-shrink:0;}
+.right{
+  flex:1;background:var(--card);border:1px solid var(--border);
+  border-left:none;border-radius:0 22px 22px 0;
+  padding:44px 36px;display:flex;flex-direction:column;justify-content:center;
+}
+.right h3{font-size:21px;font-weight:700;letter-spacing:-.3px;color:var(--text);margin-bottom:5px;}
+.right .sub{font-size:13px;color:var(--sub);margin-bottom:28px;}
+.fg{margin-bottom:13px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.fg input{
+  width:100%;padding:11px 13px;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;color:var(--text);
+  font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:all .15s;
+}
+.fg input:focus{border-color:var(--gl);box-shadow:0 0 0 3px rgba(34,197,94,.08);}
+.fg input::placeholder{color:var(--muted);}
+.lbtn{
+  width:100%;padding:12px;margin-top:8px;
+  background:linear-gradient(135deg,var(--g),var(--gl));
+  color:#fff;border:none;border-radius:10px;
+  font-size:14.5px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 20px rgba(34,197,94,.25);
+}
+.lbtn:hover{opacity:.9;transform:translateY(-1px);}
+.lbtn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.msg{font-size:13px;margin-top:12px;text-align:center;padding:9px;border-radius:8px;display:none;}
+.msg.err{background:rgba(239,68,68,.07);color:#fca5a5;display:block;}
+.msg.ok{background:rgba(34,197,94,.07);color:#86efac;display:block;}
+.back{margin-top:18px;text-align:center;font-size:13px;color:var(--muted);}
+.back a{color:var(--gl);text-decoration:none;}
+@media(max-width:640px){.left{display:none;}.right{border-radius:22px;border-left:1px solid var(--border);}.wrap{max-width:380px;}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="wrap">
+  <div class="left">
+    <div>
+      <div class="lbrand">
+        <div class="ico">🎓</div>
+        <div class="nm">Edu<span>Core</span></div>
+      </div>
+      <div class="tagline">
+        <h2>Your Academic Hub</h2>
+        <p>Access all your academic info securely in one place.</p>
+      </div>
+      <div class="feats">
+        <div class="feat"><div class="fd"></div>Academic records &amp; CGPA</div>
+        <div class="feat"><div class="fd"></div>Subject-wise attendance</div>
+        <div class="feat"><div class="fd"></div>Fee status &amp; receipts</div>
+        <div class="feat"><div class="fd"></div>Download PDF reports</div>
+        <div class="feat"><div class="fd"></div>Course &amp; faculty info</div>
+      </div>
+    </div>
+  </div>
+  <div class="right">
+    <h3>Welcome back</h3>
+    <p class="sub">Sign in to your student account</p>
+    <div class="fg"><label>Student ID</label><input type="text" id="sid" placeholder="e.g. STU2024001" autocomplete="username"></div>
+    <div class="fg"><label>Password</label><input type="password" id="pwd" placeholder="Enter your password" autocomplete="current-password"></div>
+    <button class="lbtn" id="lb" onclick="doLogin()">Sign In →</button>
+    <div id="msg" class="msg"></div>
+    <div class="back"><a href="index.html">← Back to home</a></div>
+  </div>
+</div>
+<script>
+async function doLogin(){
+  const sid=document.getElementById('sid').value.trim();
+  const pwd=document.getElementById('pwd').value.trim();
+  const msg=document.getElementById('msg');const lb=document.getElementById('lb');
+  msg.className='msg';msg.textContent='';
+  if(!sid||!pwd){msg.className='msg err';msg.textContent='Please enter your Student ID and Password.';return;}
+  lb.disabled=true;lb.textContent='Signing in...';
+  try{
+    const r=await fetch('http://localhost:8080/student/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentId:sid,password:pwd})});
+    const d=await r.json();
+    if(d.success){
+      localStorage.setItem('studentId',d.studentId||sid);
+      localStorage.setItem('username',d.username||sid);
+      msg.className='msg ok';msg.textContent='Login successful! Redirecting...';
+      setTimeout(()=>{window.location.href='student-dashboard.html';},900);
+    }else{
+      msg.className='msg err';msg.textContent='Invalid Student ID or Password.';
+      lb.disabled=false;lb.textContent='Sign In →';
+    }
+  }catch(e){
+    msg.className='msg err';msg.textContent='Server not reachable. Please try again.';
+    lb.disabled=false;lb.textContent='Sign In →';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>

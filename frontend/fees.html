@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fees — EduCore</title>
+<link rel="stylesheet" href="student.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-logo">🎓</div><div class="sb-name">Edu<span>Core</span></div></div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html" class="active"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer"><button class="logout-btn" onclick="logout()">🚪 Logout</button></div>
+</div>
+<div class="content">
+  <div class="ph"><div><h1>Fees &amp; Payments</h1><p>Fee overview and transaction history</p></div></div>
+  <div class="sc-grid" id="cards" style="display:none;">
+    <div class="sc"><div class="slabel">Total Fees</div><div class="sval" id="f-tot">—</div></div>
+    <div class="sc"><div class="slabel">Amount Paid</div><div class="sval" id="f-paid" style="color:#86efac;">—</div></div>
+    <div class="sc"><div class="slabel">Due Amount</div><div class="sval" id="f-due" style="color:#fca5a5;">—</div></div>
+    <div class="sc"><div class="slabel">Status</div><div class="sval" id="f-st" style="font-size:16px;">—</div></div>
+  </div>
+  <div class="card" id="mc"><div class="lw"><div class="spin"></div></div></div>
+</div>
+
+<script>
+const BASE='http://localhost:8080';
+const sid=localStorage.getItem('studentId');
+if(!sid){window.location.replace('student-login.html');}
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+let feeData=null,txData=[];
+
+function fmt(n){return'₹'+Number(n).toLocaleString('en-IN');}
+
+async function load(){
+  const mc=document.getElementById('mc');
+  try{
+    const[fr,tr]=await Promise.all([
+      fetch(`${BASE}/student/fees/${sid}`),
+      fetch(`${BASE}/student/transactions/${sid}`)
+    ]);
+    feeData=await fr.json();
+    txData=await tr.json()||[];
+    if(!feeData)throw new Error('No data');
+
+    const tot=Number(feeData.total)||0;
+    const paid=Number(feeData.paid)||0;
+    const due=tot-paid;
+    const pct=tot?Math.round(paid/tot*100):0;
+    const st=feeData.status||'Unknown';
+    const stCol=st==='Paid'?'#86efac':st==='Pending'?'#fca5a5':'#fde047';
+    const stBadge=st==='Paid'?'bg':st==='Pending'?'br':'by';
+
+    // stat cards
+    document.getElementById('f-tot').textContent=fmt(tot);
+    document.getElementById('f-paid').textContent=fmt(paid);
+    document.getElementById('f-due').textContent=fmt(due);
+    document.getElementById('f-st').innerHTML=`<span class="badge ${stBadge}">${st}</span>`;
+    document.getElementById('cards').style.display='grid';
+
+    // transaction rows
+    let txRows='';
+    if(txData.length){
+      txRows=txData.map((t,i)=>`<tr>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;">#TXN${String(i+1).padStart(3,'0')}</td>
+        <td>${new Date(t.date).toLocaleDateString('en-IN')}</td>
+        <td style="font-weight:600;color:#86efac;">${fmt(t.amount)}</td>
+        <td>${t.method}</td>
+        <td><span class="badge bg">${t.status||'Completed'}</span></td>
+        <td><button onclick="dlReceipt(${i})" class="rbtn">📄 Receipt</button></td>
+      </tr>`).join('');
+    }else{
+      txRows=`<tr><td colspan="6" style="text-align:center;color:var(--sub);padding:28px;">No transactions recorded yet.</td></tr>`;
+    }
+
+    mc.innerHTML=`
+      <h2>💳 Payment Progress</h2>
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--sub);">
+          <span>Paid: ${fmt(paid)}</span><span>${pct}% of ${fmt(tot)}</span>
+        </div>
+        <div class="pbar" style="height:12px;">
+          <div class="pfill" style="width:${pct}%;background:linear-gradient(90deg,var(--g),var(--gl));"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted);">
+          <span>Paid: ${fmt(paid)}</span><span>Remaining: ${fmt(due)}</span>
+        </div>
+      </div>
+
+      <h2>📋 Transaction History</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Txn ID</th><th>Date</th><th>Amount</th><th>Method</th><th>Status</th><th>Receipt</th></tr></thead>
+        <tbody>${txRows}</tbody>
+      </table></div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-dl" onclick="dlFullReceipt()">📄 Download Full Fee Receipt</button>
+        <button class="btn-sec" onclick="window.print()">🖨️ Print</button>
+      </div>`;
+  }catch(e){
+    mc.innerHTML='<div class="empty"><div class="ei">⚠️</div><p style="color:#fca5a5;">Failed to load fee data. Check backend.</p></div>';
+  }
+}
+
+function dlReceipt(idx){
+  const t=txData[idx];
+  const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a5'});
+  // header
+  doc.setFillColor(22,163,74);doc.rect(0,0,148,22,'F');
+  doc.setTextColor(255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+  doc.text('EduCore — Payment Receipt',8,14);
+  doc.setTextColor(40);doc.setFontSize(10);doc.setFont('helvetica','normal');
+  const txnId='#TXN'+String(idx+1).padStart(3,'0');
+  doc.text('Receipt No: '+txnId,8,32);
+  doc.text('Date: '+new Date(t.date).toLocaleDateString('en-IN'),8,39);
+  doc.text('Student ID: '+sid,8,46);
+  doc.setFillColor(240,253,244);doc.rect(8,52,132,18,'F');
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(22,163,74);
+  doc.text('Amount Paid: ₹'+Number(t.amount).toLocaleString('en-IN'),12,63);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(40);
+  doc.text('Payment Method: '+t.method,8,78);
+  doc.text('Status: '+(t.status||'Completed'),8,85);
+  doc.setDrawColor(22,163,74);doc.line(8,92,140,92);
+  doc.setFontSize(9);doc.setTextColor(120);
+  doc.text('This is a computer-generated receipt. No signature required.',8,98);
+  doc.text('EduCore Student Management System',8,104);
+  doc.save('Receipt_'+txnId+'_'+sid+'.pdf');
+}
+
+function dlFullReceipt(){
+  if(!feeData)return;
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFillColor(22,163,74);doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255);doc.setFontSize(18);doc.setFont('helvetica','bold');
+  doc.text('EduCore — Fee Statement',14,12);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text('Student ID: '+sid+'   |   Date: '+new Date().toLocaleDateString('en-IN'),14,21);
+
+  doc.setTextColor(40);doc.setFontSize(11);
+  const tot=Number(feeData.total)||0;const paid=Number(feeData.paid)||0;
+  doc.autoTable({
+    head:[['Description','Amount']],
+    body:[
+      ['Total Fees','₹'+tot.toLocaleString('en-IN')],
+      ['Amount Paid','₹'+paid.toLocaleString('en-IN')],
+      ['Balance Due','₹'+(tot-paid).toLocaleString('en-IN')],
+      ['Payment Status',feeData.status||'—'],
+    ],
+    startY:34,theme:'grid',
+    headStyles:{fillColor:[22,163,74],textColor:255,fontStyle:'bold'},
+    styles:{fontSize:12},
+    columnStyles:{1:{halign:'right'}}
+  });
+
+  if(txData.length){
+    const fy=doc.lastAutoTable.finalY+8;
+    doc.setFont('helvetica','bold');doc.setFontSize(12);
+    doc.text('Transaction History',14,fy);
+    const rows=txData.map((t,i)=>[
+      '#TXN'+String(i+1).padStart(3,'0'),
+      new Date(t.date).toLocaleDateString('en-IN'),
+      '₹'+Number(t.amount).toLocaleString('en-IN'),
+      t.method,
+      t.status||'Completed'
+    ]);
+    doc.autoTable({
+      head:[['Txn ID','Date','Amount','Method','Status']],
+      body:rows,startY:fy+4,theme:'striped',
+      headStyles:{fillColor:[22,163,74],textColor:255},
+      alternateRowStyles:{fillColor:[240,253,244]},
+      styles:{fontSize:10}
+    });
+  }
+  const fy2=doc.lastAutoTable.finalY+10;
+  doc.setFontSize(9);doc.setTextColor(120);doc.setFont('helvetica','normal');
+  doc.text('This is a computer-generated statement. No signature required.',14,fy2);
+  doc.save('Fee_Statement_'+sid+'.pdf');
+}
+
+load();
+</script>
+<style>
+.rbtn{
+  padding:5px 11px;background:rgba(34,197,94,0.09);color:var(--gl);
+  border:1px solid rgba(34,197,94,0.18);border-radius:7px;font-size:12px;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;
+}
+.rbtn:hover{background:rgba(34,197,94,0.16);}
+</style>
+</body>
+</html>

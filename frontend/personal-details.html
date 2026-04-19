@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Details — EduCore</title>
+<link rel="stylesheet" href="student.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-logo">🎓</div><div class="sb-name">Edu<span>Core</span></div></div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html" class="active"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer"><button class="logout-btn" onclick="logout()">🚪 Logout</button></div>
+</div>
+<div class="content">
+  <div class="ph"><div><h1>Personal Details</h1><p>Your profile information</p></div></div>
+  <div class="card" id="mc"><div class="lw"><div class="spin"></div></div></div>
+</div>
+<script>
+const BASE='http://localhost:8080';
+const sid=localStorage.getItem('studentId');
+if(!sid){window.location.replace('student-login.html');}
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+async function load(){
+  try{
+    const r=await fetch(`${BASE}/student/${sid}`);
+    const d=await r.json();
+    if(!d)throw new Error('No data');
+    const init=(d.name||'?').split(' ').filter(w=>w[0]).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('mc').innerHTML=`
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--border);">
+        <div style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--gl));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 24px rgba(34,197,94,.25);">${init}</div>
+        <div>
+          <div style="font-size:19px;font-weight:700;color:var(--text);">${d.name||'N/A'}</div>
+          <div style="font-size:13px;color:var(--sub);margin-top:3px;">${d.course||'N/A'} · Student</div>
+        </div>
+      </div>
+      <div class="pg">
+        <div class="pi"><div class="pl">Student ID</div><div class="pv">${d.studentId||sid}</div></div>
+        <div class="pi"><div class="pl">Full Name</div><div class="pv">${d.name||'N/A'}</div></div>
+        <div class="pi"><div class="pl">Email Address</div><div class="pv">${d.email||'N/A'}</div></div>
+        <div class="pi"><div class="pl">Phone Number</div><div class="pv">${d.phone||'N/A'}</div></div>
+        <div class="pi"><div class="pl">Course</div><div class="pv">${d.course||'N/A'}</div></div>
+        <div class="pi"><div class="pl">Academic Year</div><div class="pv">2025–2026</div></div>
+      </div>`;
+  }catch(e){
+    document.getElementById('mc').innerHTML='<div class="empty"><div class="ei">⚠️</div><p style="color:#fca5a5;">Failed to load. Check backend.</p></div>';
+  }
+}
+load();
+</script>
+</body>
+</html>

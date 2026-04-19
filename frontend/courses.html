@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Courses — EduCore</title>
+<link rel="stylesheet" href="student.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-logo">🎓</div><div class="sb-name">Edu<span>Core</span></div></div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html" class="active"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer"><button class="logout-btn" onclick="logout()">🚪 Logout</button></div>
+</div>
+<div class="content">
+  <div class="ph"><div><h1>My Courses</h1><p>Enrolled courses — Spring 2026</p></div></div>
+  <div class="sc-grid">
+    <div class="sc"><div class="slabel">Total Courses</div><div class="sval">6</div></div>
+    <div class="sc"><div class="slabel">Total Credits</div><div class="sval">20</div></div>
+    <div class="sc"><div class="slabel">Semester</div><div class="sval" style="font-size:16px;">Spring 2026</div></div>
+    <div class="sc"><div class="slabel">Status</div><div class="sval" style="font-size:15px;color:#86efac;">Active</div></div>
+  </div>
+  <div class="card">
+    <h2>📚 Enrolled Courses</h2>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Code</th><th>Course Name</th><th>Faculty</th><th>Credits</th><th>Type</th><th>Enrolled</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+    <button class="btn-dl" onclick="dlPDF()">📄 Download Course Schedule</button>
+  </div>
+</div>
+<script>
+const sid=localStorage.getItem('studentId');
+if(!sid){window.location.replace('student-login.html');}
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+const courses=[
+  {code:'MTH101',name:'Engineering Mathematics',faculty:'Dr. Anil Sharma',credits:4,type:'Core',enrolled:'01 Mar 2026'},
+  {code:'PHY102',name:'Applied Physics',faculty:'Prof. Neha Verma',credits:3,type:'Core',enrolled:'01 Mar 2026'},
+  {code:'CSC201',name:'Computer Science Fundamentals',faculty:'Dr. Rahul Mehta',credits:4,type:'Core',enrolled:'01 Mar 2026'},
+  {code:'ENG110',name:'Technical Communication',faculty:'Ms. Kavita Roy',credits:2,type:'Elective',enrolled:'01 Mar 2026'},
+  {code:'CHM120',name:'Engineering Chemistry',faculty:'Dr. Suresh Nair',credits:3,type:'Core',enrolled:'01 Mar 2026'},
+  {code:'DSA210',name:'Data Structures & Algorithms',faculty:'Prof. Arjun Singh',credits:4,type:'Core',enrolled:'01 Mar 2026'},
+];
+
+document.getElementById('tb').innerHTML=courses.map(c=>`<tr>
+  <td><span class="badge bb" style="font-family:'DM Mono',monospace;font-size:11px;">${c.code}</span></td>
+  <td style="font-weight:500;color:var(--text);">${c.name}</td>
+  <td style="color:var(--sub);">${c.faculty}</td>
+  <td><span class="badge bg">${c.credits} cr</span></td>
+  <td><span class="badge ${c.type==='Core'?'bb':'by'}">${c.type}</span></td>
+  <td style="color:var(--muted);font-size:12.5px;">${c.enrolled}</td>
+</tr>`).join('');
+
+function dlPDF(){
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  doc.setFillColor(22,163,74);doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255);doc.setFontSize(18);doc.setFont('helvetica','bold');
+  doc.text('EduCore — Course Schedule',14,12);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text('Student ID: '+sid+'   |   Semester: Spring 2026   |   Total Credits: 20',14,21);
+  doc.autoTable({
+    head:[['Code','Course Name','Faculty','Credits','Type']],
+    body:courses.map(c=>[c.code,c.name,c.faculty,c.credits+' cr',c.type]),
+    startY:34,theme:'striped',
+    headStyles:{fillColor:[22,163,74],textColor:255,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[240,253,244]},
+    styles:{fontSize:10}
+  });
+  const fy=doc.lastAutoTable.finalY+10;
+  doc.setFontSize(9);doc.setTextColor(120);
+  doc.text('EduCore Student Management System | Spring 2026',14,fy);
+  doc.save('Course_Schedule_'+sid+'.pdf');
+}
+</script>
+</body>
+</html>

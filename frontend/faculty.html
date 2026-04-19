@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faculty — EduCore</title>
+<link rel="stylesheet" href="student.css">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sb-brand"><div class="sb-logo">🎓</div><div class="sb-name">Edu<span>Core</span></div></div>
+  <div class="sb-label">Main</div>
+  <a href="student-dashboard.html"><span class="ni">🏠</span>Dashboard</a>
+  <a href="personal-details.html"><span class="ni">👤</span>Personal Details</a>
+  <div class="sb-label">Academics</div>
+  <a href="academic-records.html"><span class="ni">📊</span>Academic Records</a>
+  <a href="attendance.html"><span class="ni">📅</span>Attendance</a>
+  <div class="sb-label">Finance</div>
+  <a href="fees.html"><span class="ni">💳</span>Fees &amp; Payments</a>
+  <div class="sb-label">Campus</div>
+  <a href="courses.html"><span class="ni">📚</span>My Courses</a>
+  <a href="faculty.html" class="active"><span class="ni">👨‍🏫</span>Faculty</a>
+  <div class="sb-footer"><button class="logout-btn" onclick="logout()">🚪 Logout</button></div>
+</div>
+<div class="content">
+  <div class="ph"><div><h1>Faculty Members</h1><p>Department teaching staff</p></div></div>
+  <div id="fg" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;"></div>
+</div>
+<script>
+const sid=localStorage.getItem('studentId');
+if(!sid){window.location.replace('student-login.html');}
+function logout(){localStorage.clear();window.location.replace('student-login.html');}
+
+const faculty=[
+  {name:'Dr. Anil Sharma',sub:'Mathematics',email:'anil.sharma@college.edu',desig:'Professor',exp:'12 Years',dept:'Science'},
+  {name:'Prof. Meera Kapoor',sub:'Physics',email:'meera.kapoor@college.edu',desig:'Associate Professor',exp:'9 Years',dept:'Science'},
+  {name:'Dr. Raj Malhotra',sub:'Computer Science',email:'raj.malhotra@college.edu',desig:'Professor',exp:'15 Years',dept:'Engineering'},
+  {name:'Ms. Neha Singh',sub:'English',email:'neha.singh@college.edu',desig:'Assistant Professor',exp:'6 Years',dept:'Humanities'},
+  {name:'Dr. Vivek Rao',sub:'Chemistry',email:'vivek.rao@college.edu',desig:'Professor',exp:'11 Years',dept:'Science'},
+  {name:'Mr. Arjun Patel',sub:'Data Structures',email:'arjun.patel@college.edu',desig:'Assistant Professor',exp:'5 Years',dept:'Engineering'},
+];
+const cols=['#22c55e','#3b82f6','#f59e0b','#ec4899','#8b5cf6','#14b8a6'];
+
+document.getElementById('fg').innerHTML=faculty.map((f,i)=>{
+  const init=f.name.split(' ').filter(w=>/[A-Z]/.test(w[0])).map(w=>w[0]).join('').slice(0,2);
+  const dc=f.desig.includes('Asst')||f.desig.includes('Assistant')?'by':f.desig.includes('Associate')?'bb':'bg';
+  return`<div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;transition:all .2s;"
+    onmouseover="this.style.borderColor='rgba(34,197,94,.25)';this.style.transform='translateY(-2px)'"
+    onmouseout="this.style.borderColor='rgba(34,197,94,.12)';this.style.transform='translateY(0)'">
+    <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+      <div style="width:46px;height:46px;border-radius:50%;background:${cols[i%cols.length]}1a;border:2px solid ${cols[i%cols.length]}33;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:${cols[i%cols.length]};flex-shrink:0;">${init}</div>
+      <div>
+        <div style="font-size:14.5px;font-weight:600;color:var(--text);">${f.name}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:2px;">${f.sub} · ${f.dept}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--sub);">Designation</span><span class="badge ${dc}" style="font-size:11px;">${f.desig}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--sub);">Experience</span><span style="color:var(--text);">${f.exp}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--sub);">Email</span>
+        <a href="mailto:${f.email}" style="color:#4ade80;font-size:12px;text-decoration:none;">${f.email}</a>
+      </div>
+    </div>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>
