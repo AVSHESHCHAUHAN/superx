@@ -11,7 +11,7 @@ app.use(express.json());
 
 // CONFIG
 const PORT = process.env.PORT || 8080;
-const MONGO_URL = process.env.MONGO_URI;
+const MONGO_URL = process.env.MONGO_URL;
 
 // DB CONNECT
 mongoose.connect(MONGO_URL)
