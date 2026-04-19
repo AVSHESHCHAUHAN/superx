@@ -73,7 +73,7 @@ async function adminLogin() {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  const res = await fetch("https://superx-production-2b1d.up.railway.app/admin-login", {
+  const res = await fetch("https://superx-backend-celc.onrender.com/admin-login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
