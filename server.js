@@ -17,6 +17,12 @@ app.use(express.json());
 const PORT = process.env.PORT || 8080;
 const MONGO_URL = process.env.MONGO_URL;
 
+if (!MONGO_URL) {
+    console.log("❌ MONGO_URL is missing");
+    process.exit(1);
+}
+
+
 // DB CONNECT
 mongoose.connect(MONGO_URL)
 .then(() => {
