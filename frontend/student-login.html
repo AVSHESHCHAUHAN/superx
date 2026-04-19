@@ -108,7 +108,7 @@ async function doLogin(){
   if(!sid||!pwd){msg.className='msg err';msg.textContent='Please enter your Student ID and Password.';return;}
   lb.disabled=true;lb.textContent='Signing in...';
   try{
-    const r=await fetch('https://superx-production-2b1d.up.railway.app/student/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentId:sid,password:pwd})});
+    const r=await fetch('https://superx-backend-celc.onrender.com/student/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({studentId:sid,password:pwd})});
     const d=await r.json();
     if(d.success){
       localStorage.setItem('studentId',d.studentId||sid);
