@@ -23,11 +23,13 @@ if (!MONGO_URL) {
     process.exit(1);
 }
 
-
+let db;
 // DB CONNECT
 mongoose.connect(MONGO_URL)
 .then(() => {
     console.log("✅ MongoDB Connected");
+
+    db = mongoose.connection.db; // ✅ 
 
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
@@ -36,7 +38,6 @@ mongoose.connect(MONGO_URL)
 .catch(err => {
     console.log("❌ DB Error:", err.message);
 });
-
 // ================= ROUTES =================
 
 // -------- STUDENT LOGIN --------
