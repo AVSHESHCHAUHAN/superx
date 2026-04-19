@@ -4,13 +4,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+// CREATE APP FIRST
+const app = express();
+
+// THEN use middleware
 app.use(cors({
     origin: "*"
 }));
 
-const app = express();
-
-app.use(cors());
 app.use(express.json());
 
 // CONFIG
