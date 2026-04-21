@@ -1,10 +1,14 @@
-# 🎓 Student Information Management System
+# 🎓 Student Information Management System (SuperX)
 
-A full-stack web application to manage student data including login, attendance, academic records, fees, and more. Built using HTML, CSS, JavaScript, Node.js, Express, and MongoDB.
+A full-stack **cloud-based web application** to manage student data including login, attendance, academic records, fees, and more.
+
+The system is built using **HTML, CSS, JavaScript, Node.js, Express, and MongoDB Atlas**, and deployed using modern cloud platforms.
 
 ---
 
-## 🚀 Features
+# 🚀 Features
+
+### 🔹 Functional Features
 
 * 👨‍🎓 Student Login System
 * 👤 Personal Details
@@ -14,67 +18,78 @@ A full-stack web application to manage student data including login, attendance,
 * 🧾 Academic Records
 * 👨‍🏫 Faculty Information
 * 📊 Admin Dashboard
-* 🔐 Backend API with MongoDB
+
+### 🔹 Technical Features
+
+* 🔐 REST API with Node.js & Express
+* 🌐 JSON-based data communication
+* 🔄 CRUD operations (Create, Read, Update, Delete)
+* 🔑 Secure environment variables
+
+### 🔹 Cloud Features
+
+* ☁️ Frontend hosted on Vercel
+* ☁️ Backend deployed on Render
+* ☁️ Database managed via MongoDB Atlas
+* 🌍 Accessible from anywhere via internet
 
 ---
 
-## 🛠️ Tech Stack
+# 🛠️ Tech Stack
 
-### Frontend
+### 💻 Frontend
 
 * HTML5
 * CSS3
 * JavaScript
 
-### Backend
+### ⚙️ Backend
 
 * Node.js
 * Express.js
 
-### Database
+### 🗄️ Database
 
 * MongoDB Atlas
 
 ---
 
-## 📁 Project Structure
+# 📁 Project Structure
 
 ```
-project-root/
+superx/
 │
 ├── frontend/
 │   ├── index.html
 │   ├── student-login.html
+│   ├── admin-login.html
 │   ├── student-dashboard.html
-│   ├── attendance.html
-│   ├── courses.html
-│   ├── fees.html
-│   ├── faculty.html
-│   ├── academic-records.html
-│   └── student.css
+│   ├── admin-dashboard.html
+│   ├── student.css
+│   ├── admin.css
+│   ├── student.js
+│   └── admin.js
 │
-├── backend/
-│   ├── server.js
-│   ├── package.json
-│   └── .env
-│
+├── server.js
+├── package.json
+├── package-lock.json
 └── README.md
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+# ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+## 1️⃣ Clone the repository
 
 ```
-git clone https://github.com/your-username/student-management-system.git
-cd student-management-system/backend
+git clone https://github.com/your-username/superx.git
+cd superx
 ```
 
 ---
 
-### 2️⃣ Install dependencies
+## 2️⃣ Install dependencies
 
 ```
 npm install
@@ -82,18 +97,18 @@ npm install
 
 ---
 
-### 3️⃣ Setup environment variables
+## 3️⃣ Setup environment variables
 
-Create a `.env` file inside the `backend` folder:
+Create a `.env` file in the root directory:
 
 ```
-MONGO_URI=your_mongodb_connection_string
+MONGO_URL=your_mongodb_connection_string
 PORT=8080
 ```
 
 ---
 
-### 4️⃣ Run the server
+## 4️⃣ Run the server
 
 ```
 npm start
@@ -107,52 +122,74 @@ http://localhost:8080
 
 ---
 
-## 🌐 Deployment
+# 🌐 Deployment
 
-### Backend (Railway)
+## 🔹 Backend (Render)
 
-1. Push backend to GitHub
-2. Connect repository to Railway
-3. Add environment variable:
+* Push code to GitHub
+* Create new Web Service on Render
+* Add environment variable:
 
 ```
-MONGO_URI=your_mongodb_url
+MONGO_URL=your_mongodb_url
 ```
 
-4. Deploy 🚀
+* Start command:
+
+```
+node server.js
+```
+
+* Deploy 🚀
 
 ---
 
-### Frontend
+## 🔹 Frontend (Vercel)
 
-You can deploy frontend using:
-
-* GitHub Pages
-* Netlify
-* Vercel
+* Connect GitHub repo to Vercel
+* Set **Root Directory = frontend**
+* Deploy
 
 ---
 
-## 🔐 Environment Variables
+## 🔗 Cloud Architecture
+
+```
+User → Vercel (Frontend)
+     → Render (Backend API)
+     → MongoDB Atlas (Database)
+```
+
+---
+
+# 🔐 Environment Variables
 
 | Variable  | Description                     |
 | --------- | ------------------------------- |
-| MONGO_URI | MongoDB Atlas connection string |
-| PORT      | Server port (auto on Railway)   |
+| MONGO_URL | MongoDB Atlas connection string |
+| PORT      | Server port                     |
 
 ---
 
-## ⚠️ Important Notes
+# ⚠️ Important Notes
 
 * Do NOT upload `.env` file to GitHub
 * Always use environment variables for sensitive data
+* Ensure MongoDB Atlas allows network access
 
 ---
 
-## 👨‍💻 Author
+# 👨‍💻 Author
 
-Your Name
-GitHub: https://github.com/your-username
+**Avshesh Chauhan**
+GitHub: https://github.com/AVSHESHCHAUHAN
+
+---
+
+# ⭐ Support
+
+If you like this project, give it a ⭐ on GitHub!
+
 
 ---
 
